@@ -1,22 +1,33 @@
-import { PrismaClient } from '@prisma/client';
+const { PrismaClient } = require('@prisma/client');
+const fs = require('fs');
+const path = require('path');
+
 const prisma = new PrismaClient();
 
 async function main() {
 
-    const words = [
-    'amigo', 'carro', 'feliz', 'jogar', 'mundo',
-    'prisma','node','react','tailw','express'
-    ];
+  const filePath = path.join(__dirname, '../data/palavras.txt');
+  const fileContent = fs.readFileSync(filePath, 'utf-8');
 
-    for (const w of words) {
-        await prisma.word.upsert({
-            where: { text: w},
-            update: {},
-            create: { text: w},
-        });
-    }
+  const words = fileContent
+    .split('\n')
+    .map(w => w.trim().toLowerCase())
+    .filter(w => w.length === 5);
 
-    console.log(`Seeded ${words.length} words.`)
+  for (const text of words) {
+    await prisma.word.upsert({
+      where: { text },
+      update: {},
+      create: { text },
+    });
+  }
+
+  console.log(`Seeded ${words.length} words.`);
 }
 
-main().catch(e => console.log(e)).finally( async () => await prisma.$disconnect());
+main()
+  .catch(e => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(() => prisma.$disconnect());

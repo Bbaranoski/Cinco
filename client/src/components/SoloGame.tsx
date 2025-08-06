@@ -1,24 +1,35 @@
 'use client';
 import React, { useState, useEffect } from "react";
+import { useWords, validateWord } from "@/hooks/useWords";
 
-const WORDS = ['teste', 'cinco'];
 const MAX_TRIES = 6;
 
 export default function SoloGame() {
 
+    const { data: words, isLoading, isError } = useWords();
     const [secret, setSecret] = useState<string>('');
     const [guess, setGuess] = useState<string>('');
     const [history, setHistory] = useState<string[]>([]);
     const [status, setStatus] = useState<'PLAY'|'WIN'|'LOSE'>('PLAY');
 
     useEffect(() => {
-        const idx = Math.floor(Math.random() * WORDS.length);
-        setSecret(WORDS[idx])
-    }, []);
+        if(words && words.length) {
+            const idx = Math.floor(Math.random() * words.length);
+            setSecret(words[idx]);
+        }
+    }, [words]);
     
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if(status !== 'PLAY') return;
+        console.log(words)
+        const isValidLocally = words?.includes(guess);
+
+        const valid = isValidLocally ?? await validateWord(guess);
+        if(!valid) {
+            alert('Palavra inválida!');
+            return;
+        }
 
         const nextHistory = [...history, guess];
         setHistory(nextHistory);
@@ -36,6 +47,9 @@ export default function SoloGame() {
         })
     }
 
+    if(isLoading) return <p>Carregando palavras...</p>
+    if(isError) return <p>Erro ao carregar palavras.</p>
+
     return(
         <div>
             <div className="mb-4">
@@ -46,7 +60,7 @@ export default function SoloGame() {
                 <form onSubmit={handleSubmit} className="flex gap-2">
                     <input className="border px-2"
                         value={guess}
-                        onChange={e => setGuess(e.target.value)}
+                        onChange={e => setGuess(e.target.value.trim().toLowerCase())}
                         maxLength={secret.length}
                         placeholder={`Palpite (${secret.length} letras)`}
                         required

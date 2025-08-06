@@ -54,3 +54,17 @@ export async function deleteWordById(req: Request, res: Response){
         res.status(500).json({ error: 'Failed to delete word.' })
     }
 }
+
+export async function findWord(req: Request, res: Response) {
+    try {
+        const { word } = req.query;
+        if(!word || typeof word !== 'string'){
+            return res.status(400).json({ valid: false, error: 'Parâmetro word ausente' });
+        }
+        const exists = await prisma.word.findUnique({ where: { text: word.toLowerCase() } });
+        return res.json({ valid: Boolean(exists) });
+    } catch(erro) {
+        console.error(erro);
+        res.status(500).json({ valid: false, error: 'Erro no servidor' });
+    }
+};
