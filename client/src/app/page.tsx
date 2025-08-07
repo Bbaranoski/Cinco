@@ -3,7 +3,7 @@ import SoloPage from "./solo/page";
 
 export default function Home() {
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-screen flex justify-center">
       <SoloPage/>
     </div>
   );

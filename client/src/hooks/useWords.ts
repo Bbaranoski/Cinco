@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 async function fetchWords(): Promise<string[]> {
-    const res = await fetch('http://localhost:3333/api/words');
+    const res = await fetch('http://BRENO:3333/api/words');
     if(!res.ok) throw new Error('Falha ao buscar palavras');
     const data: { id: number; text: string }[] = await res.json()
     return data.map(item => item.text.trim().toLowerCase())
