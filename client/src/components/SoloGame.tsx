@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { useWords, validateWord } from "@/hooks/useWords";
+import Keyboard from "./Keyboard";
 
 const MAX_TRIES = 6;
 
@@ -11,11 +12,6 @@ export default function SoloGame() {
     const [guess, setGuess] = useState<string>('');
     const [history, setHistory] = useState<string[]>([]);
     const [status, setStatus] = useState<'PLAY'|'WIN'|'LOSE'>('PLAY');
-    const key: string[]= ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o',
-         'p', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z', 'x', 'c',
-         'v', 'b', 'n', 'm'];
-    const [keyUsed, setKeyUsed] = useState<string[]>([])
-    const [correctKey, setCorrectKey] = useState<string[]>([])
 
     useEffect(() => {
         if(words && words.length) {
@@ -27,7 +23,7 @@ export default function SoloGame() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if(status !== 'PLAY') return;
-        console.log(words)
+        console.log(secret)
         const isValidLocally = words?.includes(guess);
 
         const valid = isValidLocally ?? await validateWord(guess);
@@ -46,18 +42,9 @@ export default function SoloGame() {
 
     function getFeedback(word: string) {
         return word.split('').map((l, i) => {
-            if (l === secret[i])  return <span key={i} className="flex bg-green-400 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l}</span>;
-            else if (secret.includes(l)) return <span key={i} className="flex bg-yellow-300 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l}</span>;
-            else return <span key={i} className="flex bg-gray-300 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l}</span>;
-        })
-    }
-
-    function spanKeys() {
-        return key.map((l, i) => {
-            if (secret.includes(l) && correctKey.includes(l)) return <span key={i} className="flex bg-green-400 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l}</span>;
-            else if (secret.includes(l) && keyUsed.includes(l)) return <span key={i} className="flex bg-yellow-300 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l}</span>;
-            else if (keyUsed.includes(l)) return <span key={i} className="flex bg-gray-300 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l}</span>;
-            else return <span key={i} className="flex bg-purple-300 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l}</span>;
+            if (l === secret[i])  return <span key={i} className="flex bg-green-400 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l.toUpperCase()}</span>;
+            else if (secret.includes(l)) return <span key={i} className="flex bg-yellow-300 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l.toUpperCase()}</span>;
+            else return <span key={i} className="flex bg-gray-300 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l.toUpperCase()}</span>;
         })
     }
 
@@ -96,9 +83,8 @@ export default function SoloGame() {
                 </div>
             )}
 
-            <div className="m-2 flex">
+            <Keyboard history={history} secret={secret}/>
 
-            </div>
         </div>
     )
 }

@@ -4,8 +4,8 @@ import SoloGame from '@/components/SoloGame';
 
 export default function SoloPage() {
     return (
-        <div className='p-4'>
-            <h1 className='text-3xl font-bold mb-6 pl-10'>
+        <div className='p-4 flex flex-col items-center'>
+            <h1 className='text-3xl font-bold mb-6'>
                 Modo Solo
             </h1>
             <SoloGame />
