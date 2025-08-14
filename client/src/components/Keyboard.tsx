@@ -15,15 +15,16 @@ const KEYS = [
 
 function clsForStatus(status?: LetterStatus) {
     switch (status) {
-        case 'correct': return 'bg-green-600 text-whtie';
-        case 'present': return 'bg-yellow-400 text-black';
-        case 'absent':  return 'bg-gray-500 text-white';
+        case 'correct': return 'bg-green-400 text-black';
+        case 'present': return 'bg-yellow-300 text-black';
+        case 'absent':  return 'bg-gray-400 text-black';
         default:        return 'bg-gray-200 text-black';
    }
 }
 
 export default function Keyboard({ history, secret }: Props) {
     const status = useMemo(() => buildLetterStatus(history, secret), [history, secret]);
+    console.log(status)
 
     return (
         <div className="w-full mt-6 select-none">

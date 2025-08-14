@@ -1,16 +1,18 @@
 'use client';
 import React, { useState, useEffect } from "react";
 import { useWords, validateWord } from "@/hooks/useWords";
+import { HistoryItem, LetterStatus } from "@/lib/types";
+import { computeLocalStatus } from "@/lib/computeLocalStatus";
 import Keyboard from "./Keyboard";
 
 const MAX_TRIES = 6;
 
-export default function SoloGame() {
+export default function SoloGame({ word }: { word: string[] }) {
 
     const { data: words, isLoading, isError } = useWords();
     const [secret, setSecret] = useState<string>('');
     const [guess, setGuess] = useState<string>('');
-    const [history, setHistory] = useState<string[]>([]);
+    const [history, setHistory] = useState<HistoryItem[]>([]);
     const [status, setStatus] = useState<'PLAY'|'WIN'|'LOSE'>('PLAY');
 
     useEffect(() => {
@@ -23,28 +25,32 @@ export default function SoloGame() {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if(status !== 'PLAY') return;
+        const g = guess.trim().toLowerCase();
         console.log(secret)
-        const isValidLocally = words?.includes(guess);
+        const isValidLocally = words?.includes(g);
 
-        const valid = isValidLocally ?? await validateWord(guess);
+        const valid = isValidLocally ?? await validateWord(g);
         if(!valid) {
             alert('Palavra inválida!');
             return;
         }
 
-        const nextHistory = [...history, guess];
-        setHistory(nextHistory);
+        const statuses = computeLocalStatus(secret, g);
+
+        const newItem: HistoryItem = { word: g, status: statuses };
+        setHistory(prev => [...prev, newItem]);
         setGuess('');
 
-        if(guess === secret) setStatus('WIN');
-        else if (nextHistory.length >= MAX_TRIES) setStatus('LOSE')
+        const won = statuses.every( s => s === 'correct');
+        if (won) setStatus('WIN');
+        else if (history.length + 1 >= MAX_TRIES) setStatus('LOSE')
     };
 
     function getFeedback(word: string) {
         return word.split('').map((l, i) => {
             if (l === secret[i])  return <span key={i} className="flex bg-green-400 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l.toUpperCase()}</span>;
             else if (secret.includes(l)) return <span key={i} className="flex bg-yellow-300 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l.toUpperCase()}</span>;
-            else return <span key={i} className="flex bg-gray-300 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l.toUpperCase()}</span>;
+            else return <span key={i} className="flex bg-gray-400 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l.toUpperCase()}</span>;
         })
     }
 

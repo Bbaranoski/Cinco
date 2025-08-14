@@ -1,8 +1,7 @@
-export type LetterStatus = 'correct' | 'present' | 'absent' | 'unknown';
+import { LetterStatus, HistoryItem } from "./types";
 
-export function buildLetterStatus(history: string[], secret: string): Map<string, LetterStatus> {
+export function buildLetterStatus(history: HistoryItem[]): Map<string, LetterStatus> {
     const statuses = new Map<string, LetterStatus>();
-    const normSecret = secret?.trim().toLowerCase();
 
     for (const rawGuess of history) {
         const guess = (rawGuess ?? '').trim().toLowerCase();
