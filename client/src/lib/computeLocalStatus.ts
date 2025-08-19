@@ -1,15 +1,15 @@
 import { LetterStatus } from "./types";
 
-export function computeLocalStatus(secretRow: string, guessRaw: string): LetterStatus[] {
-    const secret = (secretRow ?? '').trim().toLowerCase();
+export function computeLocalStatus(secretRaw: string, guessRaw: string): LetterStatus[] {
+    const secret = (secretRaw ?? '').trim().toLowerCase();
     const guess = (guessRaw ?? '').trim().toLowerCase();
-    const len = Math.max(secret.length, guess.length);
 
     const counts: Record<string, number> = {};
     for (let i = 0; i < secret.length; i++) {
         const ch = secret[i];
-        counts[i] = (counts[ch] ?? 0) + 1;
+        counts[ch] = (counts[ch] ?? 0) + 1;
     }
+
 
     const localStatus: LetterStatus[] = new Array(guess.length).fill('unknown');
 
@@ -26,7 +26,7 @@ export function computeLocalStatus(secretRow: string, guessRaw: string): LetterS
         const g = guess[i];
         if ((counts[g] ?? 0) > 0){
             localStatus[i] = 'present';
-            counts[g] -= 1
+            counts[g] -= 1;
         } else {
             localStatus[i] = 'absent';
         }

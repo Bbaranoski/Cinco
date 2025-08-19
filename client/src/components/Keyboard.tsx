@@ -1,11 +1,7 @@
 'use client';
 import React, { useMemo } from "react";
-import { buildLetterStatus, LetterStatus } from "@/lib/letterStatus";
-
-type Props = {
-    history: string[];
-    secret: string;
-};
+import { buildLetterStatusFromHistory } from "@/lib/letterStatus";
+import { HistoryItem, LetterStatus } from "@/lib/types";
 
 const KEYS = [
     'q','w','e','r','t','y','u','i','o','p',
@@ -15,16 +11,15 @@ const KEYS = [
 
 function clsForStatus(status?: LetterStatus) {
     switch (status) {
-        case 'correct': return 'bg-green-400 text-black';
+        case 'correct': return 'bg-green-400 text-white';
         case 'present': return 'bg-yellow-300 text-black';
         case 'absent':  return 'bg-gray-400 text-black';
         default:        return 'bg-gray-200 text-black';
    }
 }
 
-export default function Keyboard({ history, secret }: Props) {
-    const status = useMemo(() => buildLetterStatus(history, secret), [history, secret]);
-    console.log(status)
+export default function Keyboard({ history, secret }: { history: HistoryItem[], secret: string }) {
+    const status = useMemo(() => buildLetterStatusFromHistory(history), [history]);
 
     return (
         <div className="w-full mt-6 select-none">

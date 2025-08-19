@@ -43,16 +43,8 @@ export default function SoloGame({ word }: { word: string[] }) {
 
         const won = statuses.every( s => s === 'correct');
         if (won) setStatus('WIN');
-        else if (history.length + 1 >= MAX_TRIES) setStatus('LOSE')
+        else if (history.length + 1 >= MAX_TRIES) setStatus('LOSE');
     };
-
-    function getFeedback(word: string) {
-        return word.split('').map((l, i) => {
-            if (l === secret[i])  return <span key={i} className="flex bg-green-400 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l.toUpperCase()}</span>;
-            else if (secret.includes(l)) return <span key={i} className="flex bg-yellow-300 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l.toUpperCase()}</span>;
-            else return <span key={i} className="flex bg-gray-400 px-1 w-10 h-10 rounded-md text-black justify-center items-center">{l.toUpperCase()}</span>;
-        })
-    }
 
     if(isLoading) return <p>Carregando palavras...</p>
     if(isError) return <p>Erro ao carregar palavras.</p>
@@ -60,12 +52,27 @@ export default function SoloGame({ word }: { word: string[] }) {
     return(
         <div>
             <div className="mb-4">
-                {history.map((w, i) => <div className="flex p-2 gap-2"
-                key={i}>{getFeedback(w)}</div>)}
+                {history.map((item, i) => (
+                    <div key={i} className="flex justify-center gap-1 mb-1">
+                        {item.word.split('').map((ch, idx) => {
+                            const s: LetterStatus = item.status[idx];
+                            const classes =
+                                s === 'correct' ? 'bg-green-400 text-white' :
+                                s === 'present' ? 'bg-yellow-300 text-black' :
+                                s === 'absent'  ? 'bg-gray-400 text-black' :
+                                'bg-gray-200 text-black';
+                            return (
+                                <span key={idx} className={`px-2 py-1 rounded-md w-10 h-10 flex items-center justify-center ${classes}`}>
+                                    {ch.toUpperCase()}
+                                </span>
+                            );
+                        })}
+                    </div>
+                ))}
             </div>
 
             {status === 'PLAY' ? (
-                <form onSubmit={handleSubmit} className="flex gap-2">
+                <form onSubmit={handleSubmit} className="flex justify-center gap-2">
                     <input className="border px-2"
                         type="text"
                         value={guess}
