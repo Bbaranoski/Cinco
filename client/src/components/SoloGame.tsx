@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useWords, validateWord } from "@/hooks/useWords";
 import { HistoryItem, LetterStatus } from "@/lib/types";
 import { computeLocalStatus } from "@/lib/computeLocalStatus";
@@ -22,11 +22,27 @@ export default function SoloGame({ word }: { word: string[] }) {
         }
     }, [words]);
     
-    async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+    const handleKey = useCallback((k: string) => {
         if(status !== 'PLAY') return;
-        const g = guess.trim().toLowerCase();
-        console.log(secret)
+
+        setGuess(prev => {
+            if(!secret) return prev
+            if(prev.length >= secret.length) return prev;
+            return prev + k;
+        });
+    }, [secret, status])
+
+    const handleBackspace = useCallback(() => {
+        if(status !== 'PLAY') return;
+        setGuess(prev => prev.slice(0, -1));
+    }, [status]);
+
+    const handleEnter = useCallback(async () => {
+        if(status !== 'PLAY') return;
+        const g = guess.trim().toLocaleLowerCase();
+        if(!g || g.length !== secret.length) {
+            return;
+        }
         const isValidLocally = words?.includes(g);
 
         const valid = isValidLocally ?? await validateWord(g);
@@ -36,21 +52,56 @@ export default function SoloGame({ word }: { word: string[] }) {
         }
 
         const statuses = computeLocalStatus(secret, g);
-
         const newItem: HistoryItem = { word: g, status: statuses };
-        setHistory(prev => [...prev, newItem]);
+
+        setHistory(prev => {
+            const nh = [...prev, newItem];
+            if(nh.length >= MAX_TRIES) {
+                const lastWon = statuses.every(s => s === 'correct');
+                if(!lastWon) {
+                    setStatus('LOSE')
+                }
+            }
+            return nh;
+        });
+
+        const won = statuses.every(s => s === 'correct');
+        if(won) setStatus('WIN');
+
         setGuess('');
 
-        const won = statuses.every( s => s === 'correct');
-        if (won) setStatus('WIN');
-        else if (history.length + 1 >= MAX_TRIES) setStatus('LOSE');
-    };
+    }, [guess, secret, status]);
+
+    useEffect(() => {
+        function onKeyDown(e: KeyboardEvent) {
+            if(status !== 'PLAY') return;
+
+            const k = e.key;
+            if(k === 'Backspace') {
+                e.preventDefault();
+                handleBackspace();
+                return;
+            }
+            if(k === 'Enter') {
+                e.preventDefault();
+                void handleEnter();
+                return;
+            }
+            if(/^[a-zA-Z]$/.test(k)) {
+                e.preventDefault();
+                handleKey(k.toLowerCase());
+            }
+        }
+
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [handleBackspace, handleEnter, handleKey, status]);
 
     if(isLoading) return <p>Carregando palavras...</p>
     if(isError) return <p>Erro ao carregar palavras.</p>
 
     return(
-        <div>
+        <div className="flex flex-col justify-around h-full">
             <div className="mb-4">
                 {history.map((item, i) => (
                     <div key={i} className="flex justify-center gap-1 mb-1">
@@ -71,32 +122,32 @@ export default function SoloGame({ word }: { word: string[] }) {
                 ))}
             </div>
 
-            {status === 'PLAY' ? (
-                <form onSubmit={handleSubmit} className="flex justify-center gap-2">
-                    <input className="border px-2"
-                        type="text"
-                        value={guess}
-                        onChange={e => setGuess(e.target.value.trim().toLowerCase())}
-                        maxLength={secret.length}
-                        placeholder={`Palpite (${secret.length} letras)`}
-                        required
-                    />
-                    <button type="submit" className="bg-blue-500 text-white px-3">Chutar</button>
-                </form>
-            ) : (
-                <div className="mt-4">
-                    {
-                        status === 'WIN' ?
-                            <p className="text-green-600">Você ganhou! A palavra era <strong>{secret}</strong>.</p> :
-                            <p className="text-red-600">Você perdeu… A palavra era <strong>{secret}</strong>.</p>
-                    }
-                    <button className="mt-2 underline"
-                        onClick={() => window.location.reload()}
-                    >Jogar de novo</button>
-                </div>
-            )}
+            <form onSubmit={(e) => { e.preventDefault(); void handleEnter(); }} className="flex justify-center">
+                <input
+                    value={guess}
+                    onChange={e => {
+                        const val = e.target.value.replace(/[^a-zA-Z]/g, '').toLowerCase();
+                        if (secret && val.length > secret.length) return;
+                        setGuess(val);
+                    }}
+                    maxLength={secret.length}
+                    className="border px-2 py-1"
+                    placeholder={`Palpite (${secret ? secret.length : '-' } letras)`}
+                    disabled={status !== 'PLAY'}
+                />
+            </form>
+            
+            <Keyboard
+                history={history}
+                secret={secret}
+                onKey={(k) => handleKey(k)}
+                onBackspace={() => handleBackspace()}
+                onEnter={() => void handleEnter()}
+                disabled={status !== 'PLAY'}
+            />
 
-            <Keyboard history={history} secret={secret}/>
+            {status === 'WIN' && <p className="mt-4 text-green-600">Você ganhou! A palavra era <strong>{secret}</strong>.</p>}
+            {status === 'LOSE' && <p className="mt-4 text-red-600">Você perdeu… A palavra era <strong>{secret}</strong>.</p>}
 
         </div>
     )
