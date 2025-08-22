@@ -7,7 +7,7 @@ import Keyboard from "./Keyboard";
 
 const MAX_TRIES = 6;
 
-export default function SoloGame({ word }: { word: string[] }) {
+export default function SoloGame() {
 
     const { data: words, isLoading, isError } = useWords();
     const [secret, setSecret] = useState<string>('');
@@ -89,7 +89,7 @@ export default function SoloGame({ word }: { word: string[] }) {
             }
             if(/^[a-zA-Z]$/.test(k)) {
                 e.preventDefault();
-                handleKey(k.toLowerCase());
+                handleKey(k.toUpperCase());
             }
         }
 
@@ -113,7 +113,7 @@ export default function SoloGame({ word }: { word: string[] }) {
                                 s === 'absent'  ? 'bg-gray-400 text-black' :
                                 'bg-gray-200 text-black';
                             return (
-                                <span key={idx} className={`px-2 py-1 rounded-md w-10 h-10 flex items-center justify-center ${classes}`}>
+                                <span key={idx} className={`px-2 py-1 rounded-md w-10 h-10 flex items-center justify-center border border-black ${classes}`}>
                                     {ch.toUpperCase()}
                                 </span>
                             );
@@ -131,7 +131,7 @@ export default function SoloGame({ word }: { word: string[] }) {
                         setGuess(val);
                     }}
                     maxLength={secret.length}
-                    className="border px-2 py-1"
+                    className="border border-black rounded-md px-2 py-1"
                     placeholder={`Palpite (${secret ? secret.length : '-' } letras)`}
                     disabled={status !== 'PLAY'}
                 />
@@ -146,8 +146,8 @@ export default function SoloGame({ word }: { word: string[] }) {
                 disabled={status !== 'PLAY'}
             />
 
-            {status === 'WIN' && <p className="mt-4 text-green-600">Você ganhou! A palavra era <strong>{secret}</strong>.</p>}
-            {status === 'LOSE' && <p className="mt-4 text-red-600">Você perdeu… A palavra era <strong>{secret}</strong>.</p>}
+            {status === 'WIN' && <p className="mt-4 text-green-600">Você ganhou! A palavra era <strong>{secret.toUpperCase()}</strong>.</p>}
+            {status === 'LOSE' && <p className="mt-4 text-red-600">Você perdeu… A palavra era <strong>{secret.toUpperCase()}</strong>.</p>}
 
         </div>
     )
