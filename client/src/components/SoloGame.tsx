@@ -102,7 +102,7 @@ export default function SoloGame() {
 
     return(
         <div className="flex flex-col justify-around h-full">
-            <div className="mb-4">
+            <div className="mb-4 h-50 flex flex-col items-center">
                 {history.map((item, i) => (
                     <div key={i} className="flex justify-center gap-1 mb-1">
                         {item.word.split('').map((ch, idx) => {
@@ -120,34 +120,37 @@ export default function SoloGame() {
                         })}
                     </div>
                 ))}
+
+                {status === 'WIN' && <p className="mt-4 text-green-600">Você ganhou! A palavra era <strong>{secret.toUpperCase()}</strong>.</p>}
+                {status === 'LOSE' && <p className="mt-4 text-red-600">Você perdeu… A palavra era <strong>{secret.toUpperCase()}</strong>.</p>}
+
             </div>
 
-            <form onSubmit={(e) => { e.preventDefault(); void handleEnter(); }} className="flex justify-center">
-                <input
-                    value={guess}
-                    onChange={e => {
-                        const val = e.target.value.replace(/[^a-zA-Z]/g, '').toLowerCase();
-                        if (secret && val.length > secret.length) return;
-                        setGuess(val);
-                    }}
-                    maxLength={secret.length}
-                    className="border border-black rounded-md px-2 py-1"
-                    placeholder={`Palpite (${secret ? secret.length : '-' } letras)`}
+            <div>
+                <form onSubmit={(e) => { e.preventDefault(); void handleEnter(); }} className="flex justify-center">
+                    <input
+                        value={guess}
+                        onChange={e => {
+                            const val = e.target.value.replace(/[^a-zA-Z]/g, '').toLowerCase();
+                            if (secret && val.length > secret.length) return;
+                            setGuess(val);
+                        }}
+                        maxLength={secret.length}
+                        className="border border-black rounded-md px-2 py-1"
+                        placeholder={`Palpite (${secret ? secret.length : '-' } letras)`}
+                        disabled={status !== 'PLAY'}
+                    />
+                </form>
+                
+                <Keyboard
+                    history={history}
+                    secret={secret}
+                    onKey={(k) => handleKey(k)}
+                    onBackspace={() => handleBackspace()}
+                    onEnter={() => void handleEnter()}
                     disabled={status !== 'PLAY'}
                 />
-            </form>
-            
-            <Keyboard
-                history={history}
-                secret={secret}
-                onKey={(k) => handleKey(k)}
-                onBackspace={() => handleBackspace()}
-                onEnter={() => void handleEnter()}
-                disabled={status !== 'PLAY'}
-            />
-
-            {status === 'WIN' && <p className="mt-4 text-green-600">Você ganhou! A palavra era <strong>{secret.toUpperCase()}</strong>.</p>}
-            {status === 'LOSE' && <p className="mt-4 text-red-600">Você perdeu… A palavra era <strong>{secret.toUpperCase()}</strong>.</p>}
+            </div>
 
         </div>
     )
