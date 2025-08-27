@@ -27,8 +27,8 @@ export default function SoloGame() {
 
         setGuess(prev => {
             if(!secret) return prev
-            if(prev.length >= secret.length) return prev;
-            return prev + k;
+            if(prev.length >= secret.length) return prev.toLocaleUpperCase();
+            return (prev + k).toLocaleUpperCase();
         });
     }, [secret, status])
 
@@ -102,7 +102,7 @@ export default function SoloGame() {
 
     return(
         <div className="flex flex-col justify-around h-full">
-            <div className="mb-4 h-50 flex flex-col items-center">
+            <div className="mb-4 h-100 flex flex-col items-center">
                 {history.map((item, i) => (
                     <div key={i} className="flex justify-center gap-1 mb-1">
                         {item.word.split('').map((ch, idx) => {

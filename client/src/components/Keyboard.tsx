@@ -34,7 +34,7 @@ export default function Keyboard({ history, secret, onKey, onBackspace, onEnter,
         <div className="w-full mt-6 select-none">
             <div className="felx justify-center gap-1 md-2">
                 {KEYS.slice(0, 10).map(k => (
-                    <button key={k} className={`px-2 py-2 m-1 rounded-md w-10 h-10 border border-black ${clsForStatus(status.get(k))}`}
+                    <button key={k} className={`px-2 py-2 m-1 rounded-md w-10 h-10 border border-black ${clsForStatus(status.get(k))} transition-transform transform hover:-translate-y-1 hover:shadow-lg`}
                         onClick={() => !disabled && onKey(k)}
                         disabled={disabled}
                         aria-label={`Tecla ${k}`}
@@ -46,7 +46,7 @@ export default function Keyboard({ history, secret, onKey, onBackspace, onEnter,
             </div>
             <div className="pl-5 felx justify-center gap-1 md-2">
                 {KEYS.slice(10, 19).map(k => (
-                    <button key={k} className={`px-2 py-2 m-1 rounded-md w-10 h-10 border border-black ${clsForStatus(status.get(k))}`}
+                    <button key={k} className={`px-2 py-2 m-1 rounded-md w-10 h-10 border border-black ${clsForStatus(status.get(k))} transition-transform transform hover:-translate-y-1 hover:shadow-lg`}
                         onClick={() => !disabled && onKey(k)}
                         disabled={disabled}
                         aria-label={`Tecla ${k}`}
@@ -58,7 +58,7 @@ export default function Keyboard({ history, secret, onKey, onBackspace, onEnter,
             </div>
             <div className="felx justify-center gap-1 md-2">
                 {KEYS.slice(19).map(k => (
-                    <button key={k} className={`px-2 py-2 m-1 rounded-md w-10 h-10 border border-black ${clsForStatus(status.get(k))}`}
+                    <button key={k} className={`px-2 py-2 m-1 rounded-md w-10 h-10 border border-black ${clsForStatus(status.get(k))} transition-transform transform hover:-translate-y-1 hover:shadow-lg`}
                         onClick={() => !disabled && onKey(k)}
                         disabled={disabled}
                         aria-label={`Tecla ${k}`}
@@ -70,7 +70,7 @@ export default function Keyboard({ history, secret, onKey, onBackspace, onEnter,
 
                 <button
                     onClick={() => !disabled && onBackspace()}
-                    className="px-2 py-2 m-1 rounded-md bg-red-500 text-white w-10 h-10 border border-black"
+                    className="px-2 py-2 m-1 rounded-md bg-red-500 text-white w-10 h-10 border border-black transition-transform transform hover:-translate-y-1 hover:shadow-lg"
                     type="button"
                     disabled={disabled}
                 >
@@ -79,7 +79,7 @@ export default function Keyboard({ history, secret, onKey, onBackspace, onEnter,
 
                 <button
                     onClick={() => !disabled && onEnter()}
-                    className="px-2 py-2 m-1 rounded-md bg-gray-200 text-black w-22 h-10 border border-black"
+                    className="px-2 py-2 m-1 rounded-md bg-gray-200 text-black w-22 h-10 border border-black transition-transform transform hover:-translate-y-1 hover:shadow-lg"
                     type="button"
                     disabled={disabled}
                 >
