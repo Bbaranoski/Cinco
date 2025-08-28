@@ -22,6 +22,13 @@ export default function Home() {
             emoji="🧠"
             description="Jogue contra o sistema. Bom para treinar e testar palavras"
           />
+
+          <GameModeCard
+            href="/multi"
+            title="Multiplayer"
+            emoji="⚔️"
+            description="Enfrente um amgio em partidas turn-based."
+          />
         </section>
       </div>
     </main>
