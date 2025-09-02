@@ -1,4 +1,6 @@
 import express, { Application } from 'express';
+import http from 'http'
+import { Server as IoServer } from 'socket.io';
 import cors from 'cors';
 import { wordRouter } from './routes/word.routes';
 
@@ -9,4 +11,19 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/words', wordRouter);
 
-app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}`));""
+const httpServer = http.createServer(app);
+
+const io = new IoServer(httpServer, {
+   cors: { origin: '*', methods: ['GET', 'POST'] }, 
+});
+
+io.on('connection', (socket) => {
+    console.log('Cliente conectado via Socket.ID', socket.id);
+
+    socket.on('ping', () => socket.emit('pong'));
+    socket.on('disconnet', () => console.log('Socket desconectado:', socket.id));
+});
+
+httpServer.listen(PORT, () => {
+    console.log(`Servidor rodando em http://localhost:${PORT}`);
+})

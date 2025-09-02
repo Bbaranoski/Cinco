@@ -44,7 +44,7 @@ export default function Keyboard({ history, secret, onKey, onBackspace, onEnter,
                     </button>
                 ))}
             </div>
-            <div className="pl-5 felx justify-center gap-1 md-2">
+            <div className="pl-6 felx justify-center gap-1 md-2">
                 {KEYS.slice(10, 19).map(k => (
                     <button key={k} className={`px-2 py-2 m-1 rounded-md w-10 h-10 border border-black ${clsForStatus(status.get(k))} transition-transform transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none`}
                         onClick={() => !disabled && onKey(k)}
@@ -55,6 +55,7 @@ export default function Keyboard({ history, secret, onKey, onBackspace, onEnter,
                         {k.toUpperCase()}
                     </button>
                 ))}
+                
             </div>
             <div className="felx justify-center gap-1 md-2">
                 {KEYS.slice(19).map(k => (
@@ -69,21 +70,20 @@ export default function Keyboard({ history, secret, onKey, onBackspace, onEnter,
                 ))}
 
                 <button
-                    onClick={() => !disabled && onBackspace()}
-                    className="px-2 py-2 m-1 rounded-md bg-red-500 text-white w-10 h-10 border border-black transition-transform transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none"
-                    type="button"
-                    disabled={disabled}
-                >
-                    ⌫
-                </button>
-
-                <button
                     onClick={() => !disabled && onEnter()}
                     className="px-2 py-2 m-1 rounded-md bg-gray-200 text-black w-22 h-10 border border-black transition-transform transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none"
                     type="button"
                     disabled={disabled}
                 >
                     ENTER
+                </button>
+                <button
+                    onClick={() => !disabled && onBackspace()}
+                    className="px-2 py-2 m-1 rounded-md bg-red-500 text-white w-10 h-10 border border-black transition-transform transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none"
+                    type="button"
+                    disabled={disabled}
+                >
+                    ⌫
                 </button>
             </div>
         </div>
