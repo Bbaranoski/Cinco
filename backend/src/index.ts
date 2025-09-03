@@ -3,6 +3,7 @@ import http from 'http'
 import { Server as IoServer } from 'socket.io';
 import cors from 'cors';
 import { wordRouter } from './routes/word.routes';
+import setupSocket from './socket';
 
 const app: Application = express();
 const PORT: number = Number(process.env.PORT) || 3333;
@@ -17,12 +18,7 @@ const io = new IoServer(httpServer, {
    cors: { origin: '*', methods: ['GET', 'POST'] }, 
 });
 
-io.on('connection', (socket) => {
-    console.log('Cliente conectado via Socket.ID', socket.id);
-
-    socket.on('ping', () => socket.emit('pong'));
-    socket.on('disconnet', () => console.log('Socket desconectado:', socket.id));
-});
+setupSocket(io);
 
 httpServer.listen(PORT, () => {
     console.log(`Servidor rodando em http://localhost:${PORT}`);
