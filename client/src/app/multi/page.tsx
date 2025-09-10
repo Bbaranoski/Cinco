@@ -1,17 +1,35 @@
 'use client';
+import React, { useState } from "react";
+import { useSocket } from "@/hooks/useSocket";
+import { useRouter } from "next/navigation";
 
-import React from "react";
-import Link from "next/link";
+export default function MultiLobby() {
+    const { socket, connected } = useSocket();
+    const router = useRouter();
+    const [roomId, setRoomId] = useState('');
 
-export default function MultiPage() {
+    function createRoom() {
+        socket.emit('create-room', (res: any) => {
+            if (res?.roomId) router.push(`/multi/room/${res.roomId}`)
+        });
+    }
 
-    return(
-        <div className='bg-stone-500 min-h-screen p-4 flex flex-col items-center justify-between'>
-            <h1 className='text-3xl font-bold mb-6'>
-                Multiplayer
-            </h1>
+    function joinRoom() {
+        socket.emit('join_room', { roomId }, (res: any) => {
+            if (res?.ok) router.push(`/multi/room/${roomId}`);
+            else alert(res.error || 'Erro ao entrar');
+        });
+    }
 
-            <Link href="/" className='text-indigo-600'>Voltar ao menu</Link>
+    return (
+        <div>
+            <h2>Multiplayer Lobby {connected ? '🟢' : '🔴'}</h2>
+            <input value={roomId}
+                onChange={e => setRoomId(e.target.value)}
+                placeholder="Código da sala"
+            />
+            <button onClick={joinRoom}>Entrar</button>
+            <button onClick={createRoom}>Criar Sala</button>
         </div>
     );
 }
