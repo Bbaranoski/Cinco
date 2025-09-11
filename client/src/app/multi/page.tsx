@@ -9,7 +9,8 @@ export default function MultiLobby() {
     const [roomId, setRoomId] = useState('');
 
     function createRoom() {
-        socket.emit('create-room', (res: any) => {
+        socket.emit('create_room', (res: any) => {
+            console.log(res) 
             if (res?.roomId) router.push(`/multi/room/${res.roomId}`)
         });
     }

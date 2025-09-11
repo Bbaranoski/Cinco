@@ -74,7 +74,14 @@ export default function setupSocket(io: Server) {
 
         socket.on('join_room', ({ roomId }, callback?: (res: any) => void) => {
             const room = rooms.get(roomId);
+
             if (!room) return callback?.({ok: false, error: 'Sala não encontrada' });
+
+            const already = room.players.some(p => p.socketId === socket.id);
+            if (already) {
+                return callback?.({ ok: true, message: 'Você já está na sala'});
+            }
+
             if (room.players.length >= 2) return callback?.({ ok: false, error: 'Sala cheia' });
 
             room.players.push({ id: socket.id, socketId: socket.id, ready: false });
@@ -87,6 +94,7 @@ export default function setupSocket(io: Server) {
 
         socket.on('set_word', ({ roomId, word }, callback?: (res: any) => void) => {
             const room = rooms.get(roomId);
+            console.log(word)
             if (!room) return callback?.({ ok: false, error: 'Sala não encontrada' });
 
             const player = room.players.find((p) => p.socketId === socket.id);
@@ -101,6 +109,7 @@ export default function setupSocket(io: Server) {
 
             if (room.players.length === 2 && room.players.every((p) => p.ready)) {
                 const starter = room.players[room.turnIndex].socketId;
+                console.log(starter)
                 io.to(roomId).emit('start_game', { starter });
             }
 
