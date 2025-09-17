@@ -31,6 +31,7 @@ export default function Home() {
           />
         </section>
       </div>
+      <img className="pl-56" src="catTongue.jpg" alt="cato" />
     </main>
   );
 }
