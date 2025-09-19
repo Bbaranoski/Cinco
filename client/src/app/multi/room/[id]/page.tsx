@@ -12,7 +12,7 @@ export default function RoomPage() {
     const [guess, setGuess] = useState('');
     const [isMyTurn, setIsMyTurn] = useState(false);
     const [wordSent, setWordSent] = useState(false);
-    const [history, setHistory] = useState<any[]>([])
+    const [history, setHistory] = useState<any[]>([]);
 
     useEffect(() => {
         socket.emit('join_room', { roomId }, (res: any) => {
@@ -28,9 +28,8 @@ export default function RoomPage() {
 
         socket.on('turn_changed', ({ current }: any) => setIsMyTurn(socket.id === current));
 
-        socket.on('guess_result', (payload: any) => {
-            
-            setHistory(payload.history[socket.id])
+        socket.on('guess_result', (payload: any) => { 
+            setHistory(payload.history)
         });
 
         socket.on('game_over', ({ winner }: any) => alert(winner === socket.id ? 'Você venceu!' : ' Você perdeu :('));
@@ -45,7 +44,6 @@ export default function RoomPage() {
     }, [roomId]);
 
     const sendGuess = () => {
-        console.log(room.players.socketId)
         if (!guess || guess.length === 0) return;
         if (!isMyTurn) {
             alert('Não é sua vez');
@@ -69,26 +67,35 @@ export default function RoomPage() {
                     <h3>Sala: {roomId}</h3>
                     <div>Jogadores: {room?.players?.map((p: any) => p.socketId).join(', ')}</div>
                 </div>
-
-                <div className='flex flex-col gap-4'>
-                    {history.map((h, idx) => (
-                        <div key={idx} className="flex gap-1">
-                            {h.guess.split('').map((ch: string, i: number) => {
-                                
-                                const s = h.result[i]; 
-                                const classes =
-                                    s === 'correct' ? 'bg-green-400 text-white' :
-                                    s === 'present' ? 'bg-yellow-300 text-black' :
-                                    s === 'absent'  ? 'bg-gray-400 text-black' :
-                                    'bg-gray-200 text-black';
-                                return (
-                                    <span key={i} className={`px-2 py-1 rounded-md w-10 h-10 flex items-center justify-center border border-black ${classes}`}>
-                                        {ch.toUpperCase()}</span>
-                                );
-                            })}
-                        </div>
-                    ))}
+                <div className='flex gap-20'>
+                    {room && room.players && room.players.length > 0 && (
+                        room.players.map((p: any) => 
+                            <div className='flex flex-col gap-4'
+                                key={p.socketId}
+                            >
+                                <h2>{p.socketId === socket.id ? 'Você' : 'Ele'}</h2>
+                                {(history[p.socketId] ?? []).map((h: any, idx: any) => (
+                                    <div key={idx} className="flex gap-1">
+                                        {h.guess.split('').map((ch: string, i: number) => {
+                                            
+                                            const s = h.result[i]; 
+                                            const classes =
+                                                s === 'correct' ? 'bg-green-400 text-white' :
+                                                s === 'present' ? 'bg-yellow-300 text-black' :
+                                                s === 'absent'  ? 'bg-gray-400 text-black' :
+                                                'bg-gray-200 text-black';
+                                            return (
+                                                <span key={i} className={`px-2 py-1 rounded-md w-10 h-10 flex items-center justify-center border border-black ${classes}`}>
+                                                    {ch.toUpperCase()}</span>
+                                            );
+                                        })}
+                                    </div>
+                                ))}
+                            </div>
+                        )
+                    )}
                 </div>
+                
 
                 {!wordSent && (
                     <form className='flex flex-col items-center justify-center gap-6 border rounded-2xl p-24 bg-white-700 shadow-lg'
@@ -125,6 +132,7 @@ export default function RoomPage() {
                     </div>
                 )}
             </div>
+
         </main>
     );
 }
