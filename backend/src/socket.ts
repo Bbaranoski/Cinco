@@ -109,7 +109,6 @@ export default function setupSocket(io: Server) {
 
             if (room.players.length === 2 && room.players.every((p) => p.ready)) {
                 const starter = room.players[room.turnIndex].socketId;
-                console.log(starter)
                 io.to(roomId).emit('start_game', { starter });
             }
 
