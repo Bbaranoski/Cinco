@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useSocket } from '@/hooks/useSocket';
 import { useParams } from 'next/navigation';
 import { computeLocalStatus } from '@/lib/computeLocalStatus';
+import { useWords, validateWord } from '@/hooks/useWords';
 
 export default function RoomPage() {
     const { socket } = useSocket();
     const { id: roomId } = useParams();
+    const { data: words, isLoading, isError } = useWords();
     const [room, setRoom] = useState<any>(null);
     const [word, setWord] = useState('');
     const [guess, setGuess] = useState('');
@@ -43,22 +45,47 @@ export default function RoomPage() {
         };
     }, [roomId]);
 
-    const sendGuess = () => {
+    const sendGuess = async () => {
         if (!guess || guess.length === 0) return;
         if (!isMyTurn) {
             alert('Não é sua vez');
             return;
         }
 
-        const guessNorm = guess.trim().toLowerCase();
+        const secret = guess.trim().toLocaleLowerCase();
+        const isValidLocally = words?.includes(secret);
+        const valid = isValidLocally ?? await validateWord(secret);
 
-        socket.emit('guess', { roomId, guess: guessNorm }, (res: any) => {
+        if (!valid) {
+            alert('Palavra invalida');
+            return;
+        }
+
+        socket.emit('guess', { roomId, guess: secret }, (res: any) => {
             if (!res.ok) alert(res.error || 'Erro no palpite');
+            
             setGuess('');
         });
     };
 
-    const submitWord = () =>{ socket.emit('set_word', { roomId, word }); console.log(room)};
+    const submitWord = async () =>{ 
+        if (wordSent) return;
+
+        const secret = word.trim().toLocaleLowerCase();
+        const isValidLocally = words?.includes(secret);
+        const valid = isValidLocally ?? await validateWord(secret);
+
+        if (!valid) {
+            alert('Palavra invalida');
+            return;
+        }
+
+        socket.emit('set_word', { roomId, word }) 
+
+        setWord('');
+
+        alert('Palavra enviada')
+    };
 
     return(
         <main className="bg-stone-500 min-h-screen w-full flex items-center p-6">
@@ -68,7 +95,7 @@ export default function RoomPage() {
                     <div>Jogadores: {room?.players?.map((p: any) => p.socketId).join(', ')}</div>
                 </div>
                 <div className='flex gap-20'>
-                    {room && room.players && room.players.length > 0 && (
+                    {room && room.players && room.players.length > 0 && wordSent && (
                         room.players.map((p: any) => 
                             <div className='flex flex-col gap-4'
                                 key={p.socketId}
@@ -105,6 +132,7 @@ export default function RoomPage() {
                             focus-visible:outline-none"
                             value={word} onChange={e => setWord(e.target.value)} 
                             placeholder="Sua palavra"
+                            maxLength={5}
                         />
                         <button className="border rounded-2xl p-4 w-48 min-h-[50px]
                             transition-transform transform hover:-translate-y-1 hover:shadow-lg
