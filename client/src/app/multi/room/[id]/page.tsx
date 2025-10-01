@@ -1,9 +1,10 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSocket } from '@/hooks/useSocket';
 import { useParams } from 'next/navigation';
 import { computeLocalStatus } from '@/lib/computeLocalStatus';
 import { useWords, validateWord } from '@/hooks/useWords';
+import Link from 'next/link';
 
 export default function RoomPage() {
     const { socket } = useSocket();
@@ -87,6 +88,21 @@ export default function RoomPage() {
         alert('Palavra enviada')
     };
 
+    const handleKey = useCallback((k: string) => {
+        if(!isMyTurn) return;
+    
+        setGuess(prev => {
+            if(!wordSent) return prev
+            if(prev.length >= word.length) return prev.toLocaleUpperCase();
+            return (prev + k).toLocaleUpperCase();
+        });
+    }, [wordSent, isMyTurn])
+
+    const handleBackspace = useCallback(() => {
+            if(!isMyTurn) return;
+            setGuess(prev => prev.slice(0, -1));
+        }, [isMyTurn]);
+
     return(
         <main className="bg-stone-500 min-h-screen w-full flex items-center p-6">
             <div className='w-full h-full justify-center items-center flex flex-col gap-4'>
@@ -124,7 +140,7 @@ export default function RoomPage() {
                 </div>
                 
 
-                {!wordSent && (
+                {!wordSent &&(
                     <form className='flex flex-col items-center justify-center gap-6 border rounded-2xl p-24 bg-white-700 shadow-lg'
                         onSubmit={(e) => e.preventDefault()}>
                         <input className="border rounded-2xl p-2 w-56 min-h-[50px]
@@ -140,12 +156,15 @@ export default function RoomPage() {
                             onClick={submitWord}>Enviar palavra</button>
                     </form>
                 )}
+
                 {wordSent && (
                     <div>
                     {isMyTurn ? (
                         <form onSubmit={e => e.preventDefault()}
                         >
-                            <input
+                            <input className='border rounded-2xl p-2 w-56 min-h-[25px]
+                                bg-white dark:bg-gray-800
+                                focus-visible:outline-none'
                                 value={guess}
                                 onChange={e => setGuess(e.target.value)}
                                 maxLength={room?.players?.[0]?.word?.length || 5}
@@ -159,8 +178,8 @@ export default function RoomPage() {
                     )}
                     </div>
                 )}
+                <Link href="/multi" className='fixed bottom-0 m-4 p-2 text-indigo-600 '>Voltar ao lobby</Link>
             </div>
-
         </main>
     );
 }

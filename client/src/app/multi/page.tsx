@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useSocket } from "@/hooks/useSocket";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function MultiLobby() {
     const { socket, connected } = useSocket();
@@ -29,16 +30,17 @@ export default function MultiLobby() {
                         className="gap-4 flex flex-col items-center"
                     >
                         <input className="border rounded-2xl p-2 w-56 min-h-[50px]
-                        bg-white dark:bg-gray-800
-                        focus-visible:outline-none"
-                        value={roomId}
-                        onChange={e => setRoomId(e.target.value)}
-                        placeholder="Código da sala"
-                         />
+                            bg-white dark:bg-gray-800
+                            focus-visible:outline-none"
+                            value={roomId}
+                            onChange={e => setRoomId(e.target.value)}
+                            placeholder="Código da sala"
+                        />
                         <button className="border rounded-2xl p-4 w-48 min-h-[50px]
                             transition-transform transform hover:-translate-y-1 hover:shadow-lg
                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 bg-white dark:bg-gray-800" 
-                            onClick={joinRoom}>Entrar</button>
+                            onClick={joinRoom}
+                        >Entrar</button>
                     </form>
 
                 <button className="border rounded-2xl p-4 w-48 min-h-[50px]
@@ -47,6 +49,7 @@ export default function MultiLobby() {
                     onClick={createRoom}>Criar Sala</button>
                 
                 <p> Status{connected ? '🟢' : '🔴'}</p>
+                <Link href="/" className='text-indigo-600'>Voltar ao menu</Link>
             </div>
             <img className="pl-56" src="catTongue.jpg" alt="cato" />
         </main>
