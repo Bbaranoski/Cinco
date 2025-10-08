@@ -1,13 +1,16 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSocket } from '@/hooks/useSocket';
 import { useParams } from 'next/navigation';
 import { computeLocalStatus } from '@/lib/computeLocalStatus';
 import { useWords, validateWord } from '@/hooks/useWords';
 import Link from 'next/link';
+import Keyboard from '@/components/Keyboard';
+import { LetterStatus } from '@/lib/types';
 
 export default function RoomPage() {
     const { socket } = useSocket();
+    const socketId = socket.id
     const { id: roomId } = useParams();
     const { data: words, isLoading, isError } = useWords();
     const [room, setRoom] = useState<any>(null);
@@ -15,7 +18,7 @@ export default function RoomPage() {
     const [guess, setGuess] = useState('');
     const [isMyTurn, setIsMyTurn] = useState(false);
     const [wordSent, setWordSent] = useState(false);
-    const [history, setHistory] = useState<any[]>([]);
+    const [history, setHistory] = useState<Record<string, { guess: string; result: string[] }[]>>({});
 
     useEffect(() => {
         socket.emit('join_room', { roomId }, (res: any) => {
@@ -46,29 +49,6 @@ export default function RoomPage() {
         };
     }, [roomId]);
 
-    const sendGuess = async () => {
-        if (!guess || guess.length === 0) return;
-        if (!isMyTurn) {
-            alert('Não é sua vez');
-            return;
-        }
-
-        const secret = guess.trim().toLocaleLowerCase();
-        const isValidLocally = words?.includes(secret);
-        const valid = isValidLocally ?? await validateWord(secret);
-
-        if (!valid) {
-            alert('Palavra invalida');
-            return;
-        }
-
-        socket.emit('guess', { roomId, guess: secret }, (res: any) => {
-            if (!res.ok) alert(res.error || 'Erro no palpite');
-            
-            setGuess('');
-        });
-    };
-
     const submitWord = async () =>{ 
         if (wordSent) return;
 
@@ -90,18 +70,74 @@ export default function RoomPage() {
 
     const handleKey = useCallback((k: string) => {
         if(!isMyTurn) return;
-    
+
         setGuess(prev => {
             if(!wordSent) return prev
-            if(prev.length >= word.length) return prev.toLocaleUpperCase();
+            if(prev.length >= 5) return prev.toLocaleUpperCase();
             return (prev + k).toLocaleUpperCase();
         });
     }, [wordSent, isMyTurn])
 
     const handleBackspace = useCallback(() => {
+        if(!isMyTurn) return;
+
+        setGuess(prev => prev.slice(0, -1));
+    }, [isMyTurn]);
+
+    const handleEnter = useCallback(async () => {
+        if(!isMyTurn) return;
+            
+        const g = guess.trim().toLocaleLowerCase();
+        if(!g || g.length !== 5) return;
+            
+        const isValidLocally = words?.includes(g);
+
+        const valid = isValidLocally ?? await validateWord(g);
+        if(!valid) {
+            alert('Palavra inválida!');
+            return;
+        }
+
+        socket.emit('guess', { roomId, guess: g }, (res: any) => {
+            if (!res.ok) alert(res.error || 'Erro no palpite');
+            
+            setGuess('');
+        });
+    
+    }, [guess, word, isMyTurn]);
+
+    useEffect(() => {
+        function onKeyDown(e: KeyboardEvent) {
             if(!isMyTurn) return;
-            setGuess(prev => prev.slice(0, -1));
-        }, [isMyTurn]);
+    
+            const k = e.key;
+            if(k === 'Backspace') {
+                e.preventDefault();
+                handleBackspace();
+                return;
+            }
+            if(k === 'Enter') {
+                e.preventDefault();
+                void handleEnter();
+                return;
+            }
+            if(/^[a-zA-Z]$/.test(k)) {
+                e.preventDefault();
+                handleKey(k.toUpperCase());
+            }
+        }
+        
+        window.addEventListener('keydown', onKeyDown);
+        return () => window.removeEventListener('keydown', onKeyDown);
+    }, [handleBackspace, handleEnter, handleKey, isMyTurn]);
+
+    const historyKeyboard = useMemo(() => {
+        const raw = history[socketId] ?? []
+        return raw.map(h => ({
+            word: h.guess,
+            status: h.result as LetterStatus[]
+        }));
+    }, [history, socketId]) 
 
     return(
         <main className="bg-stone-500 min-h-screen w-full flex items-center p-6">
@@ -171,11 +207,18 @@ export default function RoomPage() {
                                 placeholder="Seu palpite"
                             />
 
-                            <button onClick={sendGuess}>Enviar Guess</button>
                         </form>
                     ) : (
                         <p>Aguardando vez do outro jogador...</p>
                     )}
+                        <Keyboard
+                            history={historyKeyboard}
+                            secret={room?.players.find(p => p.socketId !== socketId)?.word ?? ""}
+                            onKey={(k) => handleKey(k)}
+                            onBackspace={() => handleBackspace()}
+                            onEnter={() => void handleEnter()}
+                            disabled={!isMyTurn}
+                        />
                     </div>
                 )}
                 <Link href="/multi" className='fixed bottom-0 m-4 p-2 text-indigo-600 '>Voltar ao lobby</Link>
