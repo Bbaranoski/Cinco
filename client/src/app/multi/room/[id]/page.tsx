@@ -18,6 +18,7 @@ export default function RoomPage() {
     const [guess, setGuess] = useState('');
     const [isMyTurn, setIsMyTurn] = useState(false);
     const [wordSent, setWordSent] = useState(false);
+    const [wordLocal, setWordLocal] = useState(false)
     const [history, setHistory] = useState<Record<string, { guess: string; result: string[] }[]>>({});
 
     useEffect(() => {
@@ -66,6 +67,8 @@ export default function RoomPage() {
         setWord('');
 
         alert('Palavra enviada')
+
+        setWordLocal(true)
     };
 
     const handleKey = useCallback((k: string) => {
@@ -141,7 +144,7 @@ export default function RoomPage() {
 
     return(
         <main className="bg-stone-500 min-h-screen w-full flex items-center p-6">
-            <div className='w-full h-full justify-center items-center flex flex-col gap-4'>
+            <div className='w-full min-h-screen justify-around items-center flex flex-col gap-4'>
                 <div className='fixed top-0 left-0 m-4 p-2'>
                     <h3>Sala: {roomId}</h3>
                     <div>Jogadores: {room?.players?.map((p: any) => p.socketId).join(', ')}</div>
@@ -183,18 +186,20 @@ export default function RoomPage() {
                             bg-white dark:bg-gray-800
                             focus-visible:outline-none"
                             value={word} onChange={e => setWord(e.target.value)} 
-                            placeholder="Sua palavra"
+                            placeholder="Sua palavra (5 Letras)"
                             maxLength={5}
+                            disabled={wordLocal}
                         />
                         <button className="border rounded-2xl p-4 w-48 min-h-[50px]
                             transition-transform transform hover:-translate-y-1 hover:shadow-lg
                             focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 bg-white dark:bg-gray-800" 
-                            onClick={submitWord}>Enviar palavra</button>
+                            onClick={submitWord}>Enviar palavra
+                        </button>
                     </form>
                 )}
 
                 {wordSent && (
-                    <div>
+                    <div className='flex flex-col items-center justify-center'>
                     {isMyTurn ? (
                         <form onSubmit={e => e.preventDefault()}
                         >
@@ -204,7 +209,7 @@ export default function RoomPage() {
                                 value={guess}
                                 onChange={e => setGuess(e.target.value)}
                                 maxLength={room?.players?.[0]?.word?.length || 5}
-                                placeholder="Seu palpite"
+                                placeholder="Palpite (5 letras)"
                             />
 
                         </form>
@@ -221,7 +226,7 @@ export default function RoomPage() {
                         />
                     </div>
                 )}
-                <Link href="/multi" className='fixed bottom-0 m-4 p-2 text-indigo-600 '>Voltar ao lobby</Link>
+                <Link href="/multi" className='fixed bottom-0 m-4 p-2 text-indigo-600'>Voltar ao lobby</Link>
             </div>
         </main>
     );

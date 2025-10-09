@@ -131,7 +131,7 @@ export default function SoloGame() {
                     <input
                         value={guess}
                         onChange={e => {
-                            const val = e.target.value.replace(/[^a-zA-Z]/g, '').toLowerCase();
+                            const val = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
                             if (secret && val.length > secret.length) return;
                             setGuess(val);
                         }}
