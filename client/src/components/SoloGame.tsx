@@ -113,7 +113,7 @@ export default function SoloGame() {
                                         s === 'absent' ? 'bg-gray-400 text-black' :
                                             'bg-gray-200 text-black';
                             return (
-                                <span key={idx} className={`px-2 py-1 rounded-md w-13 h-13 flex items-center justify-center border border-black ${classes}`}>
+                                <span key={idx} className={`px-2 py-1 rounded-md w-13 h-13 flex items-center justify-center border border-black ${classes} `}>
                                     {ch.toUpperCase()}
                                 </span>
                             );

@@ -31,7 +31,7 @@ export default function Keyboard({ history, secret, onKey, onBackspace, onEnter,
     const status = useMemo(() => buildLetterStatusFromHistory(history), [history]);
 
     return (
-        <div className="w-full mt-6 select-none">
+        <div className="w-full mt-6 mb-6 select-none">
             <div className="felx justify-center gap-1 md-2">
                 {KEYS.slice(0, 10).map(k => (
                     <button key={k} className={`px-2 py-2 m-1 rounded-md w-13 h-13 border border-black ${clsForStatus(status.get(k))} transition-transform transform hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none`}

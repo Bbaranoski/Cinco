@@ -24,6 +24,10 @@ export default function MultiLobby() {
 
     return (
         <main className="bg-stone-500 min-h-screen w-full flex items-center p-6">
+            <ButtomBack
+                href="/"
+            />
+
             <div className="max-w-5xl w-full flex flex-col items-center gap-4">
                 <h2 className="text-4xl font-bold mb-2">Multiplayer Lobby</h2>
                 <form onSubmit={(e) => e.preventDefault()}
@@ -51,10 +55,7 @@ export default function MultiLobby() {
 
                 <p> Status: {connected ? '🟢' : '🔴'}</p>
             </div>
-            <img className="pl-56" src="catTongue.jpg" alt="cato" />
-            <ButtomBack
-                href="/"
-            />
+            <img className="pl-56" src="catTongue.jpg" alt="cato" />          
         </main>
     );
 }

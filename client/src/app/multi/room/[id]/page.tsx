@@ -4,7 +4,6 @@ import { useSocket } from '@/hooks/useSocket';
 import { useParams } from 'next/navigation';
 import { computeLocalStatus } from '@/lib/computeLocalStatus';
 import { useWords, validateWord } from '@/hooks/useWords';
-import Link from 'next/link';
 import Keyboard from '@/components/Keyboard';
 import { LetterStatus } from '@/lib/types';
 import ButtomBack from '@/components/ButtomBack';
@@ -21,6 +20,7 @@ export default function RoomPage() {
     const [wordSent, setWordSent] = useState(false);
     const [wordLocal, setWordLocal] = useState(false)
     const [history, setHistory] = useState<Record<string, { guess: string; result: string[] }[]>>({});
+    const [over, setOver] = useState<boolean>(false)
 
     useEffect(() => {
         socket.emit('join_room', { roomId }, (res: any) => {
@@ -40,7 +40,9 @@ export default function RoomPage() {
             setHistory(payload.history)
         });
 
-        socket.on('game_over', ({ winner }: any) => alert(winner === socket.id ? 'Você venceu!' : ' Você perdeu :('));
+        socket.on('game_over', ({ winner }: any) => {
+            setOver(true)
+        });
 
         return () => {
             socket.off('room_update');
@@ -73,7 +75,7 @@ export default function RoomPage() {
     };
 
     const handleKey = useCallback((k: string) => {
-        if (!isMyTurn) return;
+        if (!isMyTurn || over) return;
 
         setGuess(prev => {
             if (!wordSent) return prev
@@ -83,13 +85,13 @@ export default function RoomPage() {
     }, [wordSent, isMyTurn])
 
     const handleBackspace = useCallback(() => {
-        if (!isMyTurn) return;
+        if (!isMyTurn || over) return;
 
         setGuess(prev => prev.slice(0, -1));
     }, [isMyTurn]);
 
     const handleEnter = useCallback(async () => {
-        if (!isMyTurn) return;
+        if (!isMyTurn || over) return;
 
         const g = guess.trim().toLocaleLowerCase();
         if (!g || g.length !== 5) return;
@@ -145,6 +147,9 @@ export default function RoomPage() {
 
     return (
         <main className="bg-stone-500 min-h-screen w-full flex items-center p-6">
+            <ButtomBack
+                href="/multi"
+            />
             <div className='w-full justify-around items-center flex flex-col gap-20'>
                 <div className='fixed top-0 left-0 m-4 mt-10 p-2'>
                     <h3>Sala: {roomId}</h3>
@@ -153,9 +158,8 @@ export default function RoomPage() {
                 <div className='flex gap-20'>
                     {room && room.players && room.players.length > 0 && wordSent && (
                         room.players.map((p: any) =>
-                            <div className='flex flex-col gap-4'
-                                key={p.socketId}
-                            >
+                            <div className='flex flex-col gap-4 h-100'
+                                key={p.socketId}>
                                 <h2>{p.socketId === socket.id ? 'Você' : 'Ele'}</h2>
                                 {(history[p.socketId] ?? []).map((h: any, idx: any) => (
                                     <div key={idx} className="flex gap-1">
@@ -169,7 +173,8 @@ export default function RoomPage() {
                                                             'bg-gray-200 text-black';
                                             return (
                                                 <span key={i} className={`px-2 py-1 rounded-md w-13 h-13 flex items-center justify-center border border-black ${classes}`}>
-                                                    {ch.toUpperCase()}</span>
+                                                    {ch.toUpperCase()}
+                                                </span>
                                             );
                                         })}
                                     </div>
@@ -201,7 +206,7 @@ export default function RoomPage() {
 
                 {wordSent && (
                     <div className='flex flex-col items-center justify-center'>
-                        {isMyTurn ? (
+                        {isMyTurn && !over ? (
                             <form onSubmit={e => e.preventDefault()}
                             >
                                 <input className='border rounded-2xl p-2 w-56 min-h-[25px]
@@ -214,8 +219,14 @@ export default function RoomPage() {
                                 />
 
                             </form>
-                        ) : (
+                        ) : !isMyTurn && !over ? (
                             <p>Aguardando vez do outro jogador...</p>
+                        ) : (
+                            <button className="border rounded-2xl p-4 w-48 min-h-[50px]
+                                transition-transform transform hover:-translate-y-1 hover:shadow-lg
+                                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 bg-white dark:bg-gray-800"
+                                >Revanche!
+                            </button>
                         )}
                         <Keyboard
                             history={historyKeyboard}
@@ -223,14 +234,11 @@ export default function RoomPage() {
                             onKey={(k) => handleKey(k)}
                             onBackspace={() => handleBackspace()}
                             onEnter={() => void handleEnter()}
-                            disabled={!isMyTurn}
+                            disabled={(!isMyTurn || over)}
                         />
                     </div>
                 )}
             </div>
-            <ButtomBack
-                href="/multi"
-            />
         </main>
     );
 }
