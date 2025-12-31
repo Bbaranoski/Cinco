@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import SoloGame from '@/components/SoloGame';
-import Link from 'next/link';
+import ButtomBack from '@/components/ButtomBack';
 
 export default function SoloPage() {
     return (
@@ -10,7 +10,9 @@ export default function SoloPage() {
                 Modo Solo
             </h1>
             <SoloGame />
-            <Link href="/" className='text-indigo-600'>Voltar ao menu</Link>
+            <ButtomBack
+                href="/"
+            />
         </div>
     )
 }

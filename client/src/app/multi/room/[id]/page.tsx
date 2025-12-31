@@ -7,6 +7,7 @@ import { useWords, validateWord } from '@/hooks/useWords';
 import Link from 'next/link';
 import Keyboard from '@/components/Keyboard';
 import { LetterStatus } from '@/lib/types';
+import ButtomBack from '@/components/ButtomBack';
 
 export default function RoomPage() {
     const { socket } = useSocket();
@@ -145,7 +146,7 @@ export default function RoomPage() {
     return (
         <main className="bg-stone-500 min-h-screen w-full flex items-center p-6">
             <div className='w-full justify-around items-center flex flex-col gap-20'>
-                <div className='fixed top-0 left-0 m-4 p-2'>
+                <div className='fixed top-0 left-0 m-4 mt-10 p-2'>
                     <h3>Sala: {roomId}</h3>
                     <div>Jogadores: {room?.players?.map((p: any) => p.socketId).join(', ')}</div>
                 </div>
@@ -167,7 +168,7 @@ export default function RoomPage() {
                                                         s === 'absent' ? 'bg-gray-400 text-black' :
                                                             'bg-gray-200 text-black';
                                             return (
-                                                <span key={i} className={`px-2 py-1 rounded-md w-10 h-10 flex items-center justify-center border border-black ${classes}`}>
+                                                <span key={i} className={`px-2 py-1 rounded-md w-13 h-13 flex items-center justify-center border border-black ${classes}`}>
                                                     {ch.toUpperCase()}</span>
                                             );
                                         })}
@@ -226,8 +227,10 @@ export default function RoomPage() {
                         />
                     </div>
                 )}
-                <Link href="/multi" className='fixed bottom-0 m-4 p-2 text-indigo-600'>Voltar ao lobby</Link>
             </div>
+            <ButtomBack
+                href="/multi"
+            />
         </main>
     );
 }

@@ -20,7 +20,7 @@ export default function Home() {
             href="/solo"
             title="Modo Solo"
             emoji="🧠"
-            description="Jogue contra o sistema. Bom para treinar e testar palavras"
+            description="Jogue contra o sistema. Bom para treinar e testar palavras."
           />
 
           <GameModeCard
