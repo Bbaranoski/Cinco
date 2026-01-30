@@ -186,11 +186,17 @@ export default function RoomPage() {
 
 
                 {!wordSent && (
-                    <form className='flex flex-col items-center justify-center gap-6 border rounded-2xl p-24 bg-white-700 shadow-lg'
+                    <form className='flex flex-col items-center justify-center gap-6 border rounded-2xl p-24 shadow-lg'
                         onSubmit={(e) => e.preventDefault()}>
-                        <input className="border rounded-2xl p-2 w-56 min-h-[50px]
-                            bg-white dark:bg-gray-800
-                            focus-visible:outline-none"
+                        <input className="mt-8 rounded-2xl p-2 w-56 min-h-[50px]
+                            shadow-lg
+                            bg-white dark:bg-slate-700
+                            border border-slate--500/40
+                            placeholder:text-slate-300
+                            focus:border-indigo-400
+                            focus:ring-2
+                            focus:ring-indigo-400/40
+                            text-sm text-white/60"
                             value={word} onChange={e => setWord(e.target.value)}
                             placeholder="Sua palavra (5 Letras)"
                             maxLength={5}
@@ -209,9 +215,15 @@ export default function RoomPage() {
                         {isMyTurn && !over ? (
                             <form onSubmit={e => e.preventDefault()}
                             >
-                                <input className='border rounded-2xl p-2 w-56 min-h-[25px]
-                                bg-white dark:bg-gray-800
-                                focus-visible:outline-none'
+                                <input className='rounded-2xl p-2 w-56 min-h-[50px]
+                                    shadow-lg
+                                    bg-white dark:bg-slate-700
+                                    border border-slate--500/40
+                                    placeholder:text-slate-300
+                                    focus:border-indigo-400
+                                    focus:ring-2
+                                    focus:ring-indigo-400/40
+                                    text-sm text-white/60'
                                     value={guess}
                                     onChange={e => setGuess(e.target.value)}
                                     maxLength={room?.players?.[0]?.word?.length || 5}
@@ -220,12 +232,12 @@ export default function RoomPage() {
 
                             </form>
                         ) : !isMyTurn && !over ? (
-                            <p>Aguardando vez do outro jogador...</p>
+                            <p className='drop-shadow-md p-4 text-sm'>Aguardando vez do outro jogador...</p>
                         ) : (
                             <button className="border rounded-2xl p-4 w-48 min-h-[50px]
                                 transition-transform transform hover:-translate-y-1 hover:shadow-lg
                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 bg-white dark:bg-gray-800"
-                                >Revanche!
+                            >Revanche!
                             </button>
                         )}
                         <Keyboard

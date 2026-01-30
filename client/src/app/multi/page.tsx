@@ -29,16 +29,22 @@ export default function MultiLobby() {
             />
 
             <div className="max-w-5xl w-full flex flex-col items-center gap-4">
-                <h2 className="text-4xl font-bold mb-2">Multiplayer Lobby</h2>
+                <h2 className="text-4xl font-bold mb-2 tracking-wide drop-shadow-md">Multiplayer Lobby</h2>
                 <form onSubmit={(e) => e.preventDefault()}
                     className="gap-4 flex flex-col items-center"
                 >
-                    <input className="border rounded-2xl p-2 w-56 min-h-[50px]
-                            bg-white dark:bg-gray-800
-                            focus-visible:outline-none"
+                    <input className="mt-8 rounded-2xl p-2 w-56 min-h-[50px]
+                            shadow-lg
+                            bg-white dark:bg-slate-700
+                            border border-slate--500/40
+                            placeholder:text-slate-300
+                            focus:border-indigo-400
+                            focus:ring-2
+                            focus:ring-indigo-400/40
+                            text-sm text-white/60"
                         value={roomId}
                         onChange={e => setRoomId(e.target.value)}
-                        placeholder="Código da sala"
+                        placeholder="Digite o código da sala"
                     />
                     <button className="border rounded-2xl p-4 w-48 min-h-[50px]
                             transition-transform transform hover:-translate-y-1 hover:shadow-lg

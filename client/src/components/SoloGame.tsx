@@ -113,7 +113,7 @@ export default function SoloGame() {
                                         s === 'absent' ? 'bg-gray-400 text-black' :
                                             'bg-gray-200 text-black';
                             return (
-                                <span key={idx} className={`px-2 py-1 rounded-md w-13 h-13 flex items-center justify-center border border-black ${classes} `}>
+                                <span key={idx} className={`px-2 py-1 rounded-md w-13 h-13 flex items-center justify-center border border-black ${classes}`}>
                                     {ch.toUpperCase()}
                                 </span>
                             );
@@ -124,7 +124,7 @@ export default function SoloGame() {
                     <div key={i} className="flex justify-center gap-1 mb-1">
                         {secret.split('').map((ch, idx) => (
                             <span key={idx} className={"px-2 py-1 rounded-md w-13 h-13 flex items-center justify-center border border-black"}>
-                            
+
                             </span>
                         ))}
                     </div>
@@ -137,7 +137,15 @@ export default function SoloGame() {
 
             <div>
                 <form onSubmit={(e) => { e.preventDefault(); void handleEnter(); }} className="flex justify-center">
-                    <input
+                    <input className="rounded-2xl p-2 w-56 min-h-[50px]
+                            shadow-lg
+                            bg-white dark:bg-slate-700
+                            border border-slate--500/40
+                            placeholder:text-slate-300
+                            focus:border-indigo-400
+                            focus:ring-2
+                            focus:ring-indigo-400/40
+                            text-sm text-white/60"
                         value={guess}
                         onChange={e => {
                             const val = e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
@@ -145,7 +153,6 @@ export default function SoloGame() {
                             setGuess(val);
                         }}
                         maxLength={secret.length}
-                        className="border border-black rounded-md px-2 py-1"
                         placeholder={`Palpite (${secret ? secret.length : '-'} letras)`}
                         disabled={status !== 'PLAY'}
                     />

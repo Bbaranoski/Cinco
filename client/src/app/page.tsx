@@ -11,8 +11,8 @@ export default function Home() {
     <main className="bg-stone-500 min-h-screen flex items-center p-6">
       <div className="max-w-5xl w-full">
         <header className="mb-8 text-center">
-          <h1 className="text-4xl font-bold mb-2">WinMo</h1>
-          <p className="text-gray-600 dark:text-gray-300">Escolha o modo de jogo para começar</p>
+          <h1 className="text-4xl font-bold mb-2 tracking-wide drop-shadow-md">WinMo</h1>
+          <p className="text-gray-600 dark:text-gray-300 drop-shadow-md">Escolha o modo de jogo para começar</p>
         </header>
 
         <section className="flex flex-col md:flex-row gap-6 justify-center items-stretch">
