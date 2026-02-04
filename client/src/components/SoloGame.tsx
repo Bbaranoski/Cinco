@@ -139,7 +139,7 @@ export default function SoloGame() {
                 <form onSubmit={(e) => { e.preventDefault(); void handleEnter(); }} className="flex justify-center">
                     <input className="rounded-2xl p-2 w-56 min-h-[50px]
                             shadow-lg
-                            bg-white dark:bg-slate-700
+                            bg-slate-700
                             border border-slate--500/40
                             placeholder:text-slate-300
                             focus:border-indigo-400

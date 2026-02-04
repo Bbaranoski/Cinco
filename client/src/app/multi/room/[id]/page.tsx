@@ -7,6 +7,7 @@ import { useWords, validateWord } from '@/hooks/useWords';
 import Keyboard from '@/components/Keyboard';
 import { LetterStatus } from '@/lib/types';
 import ButtomBack from '@/components/ButtomBack';
+import { Modal } from '@/components/Modal';
 
 export default function RoomPage() {
     const { socket } = useSocket();
@@ -21,6 +22,7 @@ export default function RoomPage() {
     const [wordLocal, setWordLocal] = useState(false)
     const [history, setHistory] = useState<Record<string, { guess: string; result: string[] }[]>>({});
     const [over, setOver] = useState<boolean>(false)
+    const [open, setOpen] = useState(true)
 
     useEffect(() => {
         socket.emit('join_room', { roomId }, (res: any) => {
@@ -145,13 +147,19 @@ export default function RoomPage() {
         }));
     }, [history, socketId])
 
+    useEffect(() => {
+        if (wordSent) {
+            setOpen(false)
+        }
+    }, [wordSent])
+
     return (
         <main className="bg-stone-500 min-h-screen w-full flex items-center p-6">
             <ButtomBack
                 href="/multi"
             />
             <div className='w-full justify-around items-center flex flex-col gap-20'>
-                <div className='fixed top-0 left-0 m-4 mt-10 p-2'>
+                <div className='fixed top-0 left-0 m-4 mt-10 p-2 z-[60]'>
                     <h3>Sala: {roomId}</h3>
                     <div>Jogadores: {room?.players?.map((p: any) => p.socketId).join(', ')}</div>
                 </div>
@@ -186,28 +194,31 @@ export default function RoomPage() {
 
 
                 {!wordSent && (
-                    <form className='flex flex-col items-center justify-center gap-6 border rounded-2xl p-24 shadow-lg'
-                        onSubmit={(e) => e.preventDefault()}>
-                        <input className="mt-8 rounded-2xl p-2 w-56 min-h-[50px]
-                            shadow-lg
-                            bg-white dark:bg-slate-700
-                            border border-slate--500/40
-                            placeholder:text-slate-300
-                            focus:border-indigo-400
-                            focus:ring-2
-                            focus:ring-indigo-400/40
-                            text-sm text-white/60"
-                            value={word} onChange={e => setWord(e.target.value)}
-                            placeholder="Sua palavra (5 Letras)"
-                            maxLength={5}
-                            disabled={wordLocal}
-                        />
-                        <button className="border rounded-2xl p-4 w-48 min-h-[50px]
-                            transition-transform transform hover:-translate-y-1 hover:shadow-lg
-                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 bg-white dark:bg-gray-800"
-                            onClick={submitWord}>Enviar palavra
-                        </button>
-                    </form>
+                    <Modal isOpen={open} onClose={() => setOpen(false)}>
+                        <form className='flex flex-col items-center justify-center gap-6 
+                            border rounded-2xl p-24 shadow-lg bg-stone-500'
+                            onSubmit={(e) => e.preventDefault()}>
+                            <input className="mt-8 rounded-2xl p-2 w-56 min-h-[50px]
+                                shadow-lg
+                                bg-white dark:bg-slate-700
+                                border border-slate--500/40
+                                placeholder:text-slate-300
+                                focus:border-indigo-400
+                                focus:ring-2
+                                focus:ring-indigo-400/40
+                                text-sm text-white/60"
+                                value={word} onChange={e => setWord(e.target.value)}
+                                placeholder="Sua palavra (5 Letras)"
+                                maxLength={5}
+                                disabled={wordLocal}
+                            />
+                            <button className="border rounded-2xl p-4 w-48 min-h-[50px]
+                                transition-transform transform hover:-translate-y-1 hover:shadow-lg
+                                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 bg-white dark:bg-gray-800"
+                                onClick={submitWord}>Enviar palavra
+                            </button>
+                        </form>
+                    </Modal>
                 )}
 
                 {wordSent && (
